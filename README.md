@@ -92,8 +92,6 @@ You agree to defend, indemnify, and hold harmless Fullermotion LLC and its owner
 
 Nothing in this README creates a service agreement, support obligation, maintenance obligation, professional advice relationship, warranty, guarantee, or representation that the software is suitable for any specific purpose. Some jurisdictions do not allow certain warranty exclusions or liability limitations, so some of the above may not apply to you.
 
-This disclaimer is provided for general project documentation purposes and is not legal advice. Consult qualified legal counsel for advice about your specific circumstances.
-
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
