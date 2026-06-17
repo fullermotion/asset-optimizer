@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="Asset Optimizer app icon">
+  <defs>
+    <linearGradient id="base" x1="164" y1="112" x2="850" y2="924" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#24313f"/>
+      <stop offset="0.48" stop-color="#131b25"/>
+      <stop offset="1" stop-color="#0a1018"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="170" y1="112" x2="850" y2="906" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#72f4e9"/>
+      <stop offset="0.28" stop-color="#21bfb5"/>
+      <stop offset="0.68" stop-color="#257a8d"/>
+      <stop offset="1" stop-color="#0c2435"/>
+    </linearGradient>
+    <linearGradient id="aqua" x1="263" y1="232" x2="745" y2="793" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8afbf1"/>
+      <stop offset="0.45" stop-color="#28d6cb"/>
+      <stop offset="1" stop-color="#087d88"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="306" y1="232" x2="724" y2="778" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.92"/>
+      <stop offset="0.4" stop-color="#ccfffb" stop-opacity="0.34"/>
+      <stop offset="1" stop-color="#003a44" stop-opacity="0.18"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="44%" r="52%">
+      <stop offset="0" stop-color="#4bf5ea" stop-opacity="0.5"/>
+      <stop offset="0.54" stop-color="#28d6cb" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#28d6cb" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="36" stdDeviation="42" flood-color="#000814" flood-opacity="0.42"/>
+      <feDropShadow dx="0" dy="10" stdDeviation="20" flood-color="#061119" flood-opacity="0.34"/>
+    </filter>
+    <filter id="softGlow" x="-45%" y="-45%" width="190%" height="190%">
+      <feGaussianBlur stdDeviation="18" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <clipPath id="squircle">
+      <path d="M512 72c151 0 262 20 333 91 71 71 107 182 107 349S916 790 845 861c-71 71-182 91-333 91s-262-20-333-91C108 790 72 679 72 512s36-278 107-349C250 92 361 72 512 72Z"/>
+    </clipPath>
+  </defs>
+
+  <path fill="url(#base)" d="M512 72c151 0 262 20 333 91 71 71 107 182 107 349S916 790 845 861c-71 71-182 91-333 91s-262-20-333-91C108 790 72 679 72 512s36-278 107-349C250 92 361 72 512 72Z"/>
+  <g clip-path="url(#squircle)">
+    <path fill="url(#glow)" d="M155 171h714v694H155z"/>
+    <path fill="#35d8ce" opacity="0.18" filter="url(#softGlow)" d="M249 206c115-54 279-66 406-20 111 41 180 123 194 210 23 144-113 269-281 275-171 7-336-106-351-245-10-90 23-170 32-220Z"/>
+    <path fill="url(#rim)" opacity="0.72" d="M512 88c146 0 251 19 318 86 67 67 102 172 102 338S897 783 830 850c-67 67-172 86-318 86s-251-19-318-86C127 783 92 678 92 512s35-271 102-338C261 107 366 88 512 88Zm0 20c-142 0-239 18-304 83-65 65-96 162-96 321s31 256 96 321c65 65 162 83 304 83s239-18 304-83c65-65 96-162 96-321s-31-256-96-321c-65-65-162-83-304-83Z"/>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="250" y="276" width="524" height="492" rx="112" fill="#111b25"/>
+    <rect x="279" y="305" width="466" height="434" rx="88" fill="url(#aqua)"/>
+    <rect x="309" y="334" width="406" height="376" rx="72" fill="#122331" opacity="0.82"/>
+    <path fill="url(#glass)" opacity="0.36" d="M342 357c66-39 144-54 233-45 57 5 102 19 135 42-36 71-99 110-189 116-83 5-154-24-179-113Z"/>
+
+    <g transform="translate(0 10)">
+      <path fill="none" stroke="#7df9ef" stroke-width="36" stroke-linecap="round" d="M336 568c12-86 83-152 176-152 94 0 165 66 177 152"/>
+      <path fill="none" stroke="#0b7c85" stroke-width="36" stroke-linecap="round" opacity="0.72" d="M336 568c4-32 18-63 39-88"/>
+      <path fill="#e7fffd" d="M511 541 640 456 553 590c-13 20-41 24-59 8-18-16-16-45 17-57Z"/>
+      <circle cx="512" cy="574" r="44" fill="#e9fffe"/>
+      <circle cx="512" cy="574" r="23" fill="#0e7e87"/>
+    </g>
+
+    <g transform="rotate(-8 394 672)">
+      <rect x="262" y="585" width="186" height="142" rx="34" fill="#ecfffd"/>
+      <rect x="284" y="607" width="142" height="98" rx="20" fill="#0d7f87"/>
+      <circle cx="326" cy="643" r="16" fill="#9cfdf5"/>
+      <path fill="#9cfdf5" d="m295 691 43-40 31 28 24-21 31 33H295Z"/>
+    </g>
+
+    <g transform="rotate(7 645 666)">
+      <rect x="578" y="570" width="190" height="150" rx="34" fill="#eafffd"/>
+      <rect x="601" y="594" width="144" height="102" rx="21" fill="#0e7482"/>
+      <path fill="#9cfdf5" d="M651 622v46l44-23-44-23Z"/>
+      <path fill="#dffefa" opacity="0.72" d="M616 608h114v16H616zm0 72h114v16H616z"/>
+    </g>
+
+    <g opacity="0.96">
+      <path fill="none" stroke="#bffefa" stroke-width="28" stroke-linecap="round" d="M421 727h181"/>
+      <path fill="#bffefa" d="m594 681 79 46-79 46v-92Z"/>
+      <path fill="#102633" d="m608 713 24 14-24 14v-28Z"/>
+    </g>
+  </g>
+
+  <path fill="#ffffff" opacity="0.16" d="M232 156c92-39 361-52 503 9 49 21 82 54 98 99-81-55-205-89-365-89-104 0-183 12-236 35-45 20-74 48-91 85 8-68 38-116 91-139Z"/>
+</svg>
