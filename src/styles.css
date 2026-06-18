@@ -152,6 +152,7 @@ button:disabled {
 .section-heading p,
 .drop-zone p,
 .asset-meta,
+.asset-dimensions,
 .asset-path,
 .token-help {
   margin: 0;
@@ -161,6 +162,7 @@ button:disabled {
 .brand p,
 .section-heading p,
 .asset-meta,
+.asset-dimensions,
 .asset-path,
 .token-help {
   font-size: 12px;
@@ -379,11 +381,17 @@ button:disabled {
   margin-top: 6px;
 }
 
+.asset-dimensions,
 .asset-path {
   margin-top: 4px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.asset-dimensions {
+  color: var(--text);
+  font-weight: 650;
 }
 
 .asset-output {
@@ -547,6 +555,27 @@ button:disabled {
 .range-field input {
   padding: 0;
   accent-color: var(--accent);
+}
+
+.percentage-control {
+  margin-bottom: 14px;
+}
+
+.percentage-control .range-field {
+  margin-bottom: 6px;
+}
+
+.range-scale {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.range-scale strong {
+  color: var(--accent-strong);
 }
 
 .split-fields {

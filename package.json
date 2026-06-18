@@ -1,6 +1,6 @@
 {
   "name": "asset-optimizer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Desktop app for optimizing, converting, and batch-renaming image and video assets.",
   "main": "electron/main.cjs",
   "private": true,

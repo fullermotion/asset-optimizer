@@ -9,6 +9,8 @@ Website: https://www.fullermotion.com
 
 - Optimize images and videos with adjustable quality settings.
 - Convert images and videos to common output formats.
+- Review original asset dimensions before processing.
+- Resize manually by maximum width and height, or scale assets by percentage from 1% to 100%.
 - Batch rename files with pattern tokens, prefix/suffix fields, find-and-replace, padding, case options, and slugified filenames.
 - Drag and drop files into a clean desktop interface.
 - Choose a custom output folder or create optimized files beside the source assets.

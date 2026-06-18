@@ -39,6 +39,8 @@ export interface OptimizerSettings {
   quality: number;
   videoQuality: number;
   outputFormat: "auto" | "original" | "jpeg" | "png" | "webp" | "avif" | "mp4" | "webm" | "mov" | "mkv";
+  resizeMode: "manual" | "percentage";
+  resizePercent: number;
   maxWidth: number;
   maxHeight: number;
   preserveMetadata: boolean;

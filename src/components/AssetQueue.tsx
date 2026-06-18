@@ -58,9 +58,9 @@ export function AssetQueue({ assets, settings, onRemove, onClearDone, onReveal }
               </div>
               <p className="asset-meta">
                 {asset.type}
-                {asset.width && asset.height ? ` · ${asset.width}x${asset.height}` : ""}
                 {asset.duration ? ` · ${formatDuration(asset.duration)}` : ""} · {formatBytes(asset.size)}
               </p>
+              <p className="asset-dimensions">{formatAssetDimensions(asset, settings)}</p>
               <p className="asset-path">{shortPath(asset.path)}</p>
               {asset.status === "running" ? <ProgressBar value={asset.progress} /> : null}
             </div>
@@ -87,4 +87,26 @@ export function AssetQueue({ assets, settings, onRemove, onClearDone, onReveal }
       </div>
     </section>
   );
+}
+
+function formatAssetDimensions(asset: AssetItem, settings: OptimizerSettings): string {
+  if (!asset.width || !asset.height) {
+    return "Start size unavailable";
+  }
+
+  const startingSize = `Start ${asset.width} x ${asset.height}px`;
+
+  if (settings.resizeMode !== "percentage") {
+    return startingSize;
+  }
+
+  const percent = clamp(settings.resizePercent, 1, 100);
+  const outputWidth = Math.max(1, Math.round(asset.width * (percent / 100)));
+  const outputHeight = Math.max(1, Math.round(asset.height * (percent / 100)));
+
+  return `${startingSize} -> ${outputWidth} x ${outputHeight}px`;
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
 }

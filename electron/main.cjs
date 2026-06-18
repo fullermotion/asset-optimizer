@@ -126,9 +126,9 @@ ipcMain.handle("assets:optimize", async (event, payload) => {
       await fs.mkdir(path.dirname(outputPath), { recursive: true });
 
       if (asset.type === "image") {
-        await optimizeImage(asset.path, outputPath, payload.settings);
+        await optimizeImage(asset, outputPath, payload.settings);
       } else if (asset.type === "video") {
-        await optimizeVideo(asset.path, outputPath, payload.settings, (progress) => {
+        await optimizeVideo(asset, outputPath, payload.settings, (progress) => {
           event.sender.send("assets:progress", {
             id: asset.id,
             phase: "running",
@@ -252,14 +252,23 @@ function probeVideo(filePath) {
   });
 }
 
-async function optimizeImage(inputPath, outputPath, settings) {
+async function optimizeImage(asset, outputPath, settings) {
+  const inputPath = asset.path;
   const format = path.extname(outputPath).slice(1).toLowerCase();
   const quality = clamp(settings.quality ?? 80, 1, 100);
   const imageInput = await prepareImageInput(inputPath);
   let pipeline = sharp(imageInput.path).rotate();
 
   try {
-    if (settings.maxWidth || settings.maxHeight) {
+    const percentageResize = resizeDimensionsForPercentage(asset, settings);
+    if (percentageResize.width || percentageResize.height) {
+      pipeline = pipeline.resize({
+        width: percentageResize.width,
+        height: percentageResize.height,
+        fit: "inside",
+        withoutEnlargement: true
+      });
+    } else if (settings.resizeMode !== "percentage" && (settings.maxWidth || settings.maxHeight)) {
       pipeline = pipeline.resize({
         width: numberOrUndefined(settings.maxWidth),
         height: numberOrUndefined(settings.maxHeight),
@@ -331,7 +340,8 @@ function isHeicExtension(extension) {
   return extension === ".heic" || extension === ".heif";
 }
 
-function optimizeVideo(inputPath, outputPath, settings, onProgress) {
+function optimizeVideo(asset, outputPath, settings, onProgress) {
+  const inputPath = asset.path;
   const format = path.extname(outputPath).slice(1).toLowerCase();
   const quality = clamp(settings.videoQuality ?? settings.quality ?? 72, 1, 100);
   const crf = Math.round(36 - quality * 0.23);
@@ -366,7 +376,10 @@ function optimizeVideo(inputPath, outputPath, settings, onProgress) {
       return;
     }
 
-    if (settings.maxWidth || settings.maxHeight) {
+    if (settings.resizeMode === "percentage" && settings.resizePercent < 100) {
+      const scale = clamp(Number(settings.resizePercent) || 100, 1, 100) / 100;
+      command = command.videoFilters(`scale=max(2\\,trunc(iw*${scale}/2)*2):max(2\\,trunc(ih*${scale}/2)*2)`);
+    } else if (settings.resizeMode !== "percentage" && (settings.maxWidth || settings.maxHeight)) {
       const width = numberOrUndefined(settings.maxWidth) || -2;
       const height = numberOrUndefined(settings.maxHeight) || -2;
       command = command.videoFilters(`scale=${width}:${height}:force_original_aspect_ratio=decrease`);
@@ -504,6 +517,22 @@ function slugify(name) {
 function numberOrUndefined(value) {
   const number = Number(value);
   return Number.isFinite(number) && number > 0 ? Math.round(number) : undefined;
+}
+
+function resizeDimensionsForPercentage(asset, settings) {
+  if (settings.resizeMode !== "percentage") {
+    return {};
+  }
+
+  const percent = clamp(Number(settings.resizePercent) || 100, 1, 100);
+  if (percent >= 100) {
+    return {};
+  }
+
+  return {
+    width: asset.width ? Math.max(1, Math.round(asset.width * (percent / 100))) : undefined,
+    height: asset.height ? Math.max(1, Math.round(asset.height * (percent / 100))) : undefined
+  };
 }
 
 function clamp(value, min, max) {

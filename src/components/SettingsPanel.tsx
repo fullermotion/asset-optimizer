@@ -73,10 +73,6 @@ export function SettingsPanel({ activePanel, settings, onPanelChange, onSettings
             <h2>Quality</h2>
             <RangeField label="Image quality" value={settings.quality} onChange={(value) => update("quality", value)} />
             <RangeField label="Video quality" value={settings.videoQuality} onChange={(value) => update("videoQuality", value)} />
-            <div className="split-fields">
-              <NumberField label="Max width" value={settings.maxWidth} onChange={(value) => update("maxWidth", value)} />
-              <NumberField label="Max height" value={settings.maxHeight} onChange={(value) => update("maxHeight", value)} />
-            </div>
             <label className="toggle">
               <input
                 type="checkbox"
@@ -85,6 +81,27 @@ export function SettingsPanel({ activePanel, settings, onPanelChange, onSettings
               />
               <span>Preserve metadata</span>
             </label>
+          </section>
+        ) : null}
+
+        {activePanel === "optimize" ? (
+          <section className="settings-group">
+            <h2>Resize</h2>
+            <label className="field">
+              <span>Method</span>
+              <select value={settings.resizeMode} onChange={(event) => update("resizeMode", event.target.value as OptimizerSettings["resizeMode"])}>
+                <option value="manual">Max dimensions</option>
+                <option value="percentage">Percentage scale</option>
+              </select>
+            </label>
+            {settings.resizeMode === "manual" ? (
+              <div className="split-fields">
+                <NumberField label="Max width" value={settings.maxWidth} onChange={(value) => update("maxWidth", value)} />
+                <NumberField label="Max height" value={settings.maxHeight} onChange={(value) => update("maxHeight", value)} />
+              </div>
+            ) : (
+              <PercentageField value={settings.resizePercent} onChange={(value) => update("resizePercent", value)} />
+            )}
           </section>
         ) : null}
 
@@ -169,18 +186,39 @@ export function SettingsPanel({ activePanel, settings, onPanelChange, onSettings
 interface RangeFieldProps {
   label: string;
   value: number;
+  suffix?: string;
   onChange: (value: number) => void;
 }
 
-function RangeField({ label, value, onChange }: RangeFieldProps) {
+function RangeField({ label, value, suffix = "", onChange }: RangeFieldProps) {
   return (
     <label className="field range-field">
       <span>
         {label}
-        <strong>{value}</strong>
+        <strong>{value}{suffix}</strong>
       </span>
       <input type="range" min="1" max="100" value={value} onChange={(event) => onChange(Number(event.target.value))} />
     </label>
+  );
+}
+
+interface PercentageFieldProps {
+  value: number;
+  onChange: (value: number) => void;
+}
+
+function PercentageField({ value, onChange }: PercentageFieldProps) {
+  const reduction = 100 - value;
+
+  return (
+    <div className="percentage-control">
+      <RangeField label="Output scale" value={value} suffix="%" onChange={onChange} />
+      <div className="range-scale">
+        <span>1%</span>
+        <strong>{reduction}% reduction</strong>
+        <span>100%</span>
+      </div>
+    </div>
   );
 }
 
