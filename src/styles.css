@@ -561,8 +561,28 @@ button:disabled {
   margin-bottom: 14px;
 }
 
+.percentage-control:has(+ .toggle input:not(:checked)) .range-field strong,
+.percentage-control:has(+ .toggle input:not(:checked)) .range-scale strong {
+  color: var(--muted);
+}
+
 .percentage-control .range-field {
   margin-bottom: 6px;
+}
+
+.percentage-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 78px;
+  gap: 10px;
+  align-items: end;
+}
+
+.percentage-input {
+  margin-bottom: 6px;
+}
+
+.percentage-input input {
+  text-align: right;
 }
 
 .range-scale {

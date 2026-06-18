@@ -1,6 +1,6 @@
 {
   "name": "asset-optimizer",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Desktop app for optimizing, converting, and batch-renaming image and video assets.",
   "main": "electron/main.cjs",
   "private": true,
@@ -31,8 +31,8 @@
     "@types/react-dom": "^19.0.2",
     "@vitejs/plugin-react": "^4.3.4",
     "concurrently": "^9.1.2",
-    "electron": "^34.0.0",
-    "electron-builder": "^25.1.8",
+    "electron": "^42.4.1",
+    "electron-builder": "^26.15.3",
     "typescript": "^5.7.2",
     "vite": "^6.0.7",
     "wait-on": "^8.0.1"

@@ -87,21 +87,19 @@ export function SettingsPanel({ activePanel, settings, onPanelChange, onSettings
         {activePanel === "optimize" ? (
           <section className="settings-group">
             <h2>Resize</h2>
-            <label className="field">
-              <span>Method</span>
-              <select value={settings.resizeMode} onChange={(event) => update("resizeMode", event.target.value as OptimizerSettings["resizeMode"])}>
-                <option value="manual">Max dimensions</option>
-                <option value="percentage">Percentage scale</option>
-              </select>
+            <div className="split-fields">
+              <NumberField label="Max width" value={settings.maxWidth} onChange={(value) => update("maxWidth", value)} />
+              <NumberField label="Max height" value={settings.maxHeight} onChange={(value) => update("maxHeight", value)} />
+            </div>
+            <PercentageField value={settings.resizePercent} onChange={(value) => update("resizePercent", value)} />
+            <label className="toggle">
+              <input
+                type="checkbox"
+                checked={settings.resizeMode === "percentage"}
+                onChange={(event) => update("resizeMode", event.target.checked ? "percentage" : "manual")}
+              />
+              <span>Use percentage resize</span>
             </label>
-            {settings.resizeMode === "manual" ? (
-              <div className="split-fields">
-                <NumberField label="Max width" value={settings.maxWidth} onChange={(value) => update("maxWidth", value)} />
-                <NumberField label="Max height" value={settings.maxHeight} onChange={(value) => update("maxHeight", value)} />
-              </div>
-            ) : (
-              <PercentageField value={settings.resizePercent} onChange={(value) => update("resizePercent", value)} />
-            )}
           </section>
         ) : null}
 
@@ -209,10 +207,19 @@ interface PercentageFieldProps {
 
 function PercentageField({ value, onChange }: PercentageFieldProps) {
   const reduction = 100 - value;
+  const updatePercent = (nextValue: number) => {
+    onChange(Math.min(100, Math.max(1, Math.round(nextValue))));
+  };
 
   return (
     <div className="percentage-control">
-      <RangeField label="Output scale" value={value} suffix="%" onChange={onChange} />
+      <div className="percentage-row">
+        <RangeField label="Output scale" value={value} suffix="%" onChange={updatePercent} />
+        <label className="field percentage-input">
+          <span>Percent</span>
+          <input type="number" min="1" max="100" value={value} onChange={(event) => updatePercent(Number(event.target.value))} />
+        </label>
+      </div>
       <div className="range-scale">
         <span>1%</span>
         <strong>{reduction}% reduction</strong>
