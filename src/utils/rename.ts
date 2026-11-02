@@ -2,44 +2,38 @@ import type { AssetItem, OptimizerSettings, RenameSettings } from "../types";
 
 export function previewOutputName(asset: AssetItem, settings: OptimizerSettings, index: number): string {
   const base = applyRename(asset, settings.rename, settings, index);
-  return `${base}.${chooseOutputFormat(asset, settings)}`;
+  return `${base}.${outputExtension(chooseOutputFormat(asset, settings))}`;
 }
 
+// Mirrors the output format choice in electron/main.cjs so previews match the files that get written.
+const outputFormats: Partial<Record<AssetItem["type"], Set<string>>> = {
+  image: new Set(["jpeg", "png", "webp", "avif", "jxl", "tiff"]),
+  video: new Set(["mp4", "mp4-hevc", "mp4-av1", "webm", "webm-av1", "mov", "m4v", "mkv"]),
+  audio: new Set(["m4a", "opus", "mp3", "flac", "ogg", "wav", "aiff"])
+};
+const defaultFormats: Partial<Record<AssetItem["type"], string>> = { image: "webp", video: "mp4", audio: "m4a" };
+const extensionAliases: Record<string, string> = { jpg: "jpeg", tif: "tiff", aif: "aiff", oga: "ogg", aac: "m4a" };
+
 export function chooseOutputFormat(asset: AssetItem, settings: Pick<OptimizerSettings, "outputFormat">): string {
-  const imageFormats = new Set(["jpeg", "png", "webp", "avif"]);
-  const videoFormats = new Set(["mp4", "webm", "mov", "mkv"]);
+  const formats = outputFormats[asset.type];
+  if (!formats) {
+    return normalizeExtension(asset.extension);
+  }
 
   if (settings.outputFormat === "original") {
     const original = normalizeExtension(asset.extension);
-    if (asset.type === "image" && imageFormats.has(original)) {
+    if (formats.has(original)) {
       return original;
     }
-
-    if (asset.type === "video" && videoFormats.has(original)) {
-      return original;
-    }
+  } else if (formats.has(settings.outputFormat)) {
+    return settings.outputFormat;
   }
 
-  if (settings.outputFormat !== "auto") {
-    const requested = normalizeExtension(settings.outputFormat);
-    if (asset.type === "image" && imageFormats.has(requested)) {
-      return requested;
-    }
+  return defaultFormats[asset.type] ?? normalizeExtension(asset.extension);
+}
 
-    if (asset.type === "video" && videoFormats.has(requested)) {
-      return requested;
-    }
-  }
-
-  if (asset.type === "image") {
-    return "webp";
-  }
-
-  if (asset.type === "video") {
-    return "mp4";
-  }
-
-  return normalizeExtension(asset.extension);
+function outputExtension(format: string): string {
+  return format.replace(/-(hevc|av1)$/, "");
 }
 
 function applyRename(asset: AssetItem, rename: RenameSettings, settings: OptimizerSettings, index: number): string {
@@ -51,7 +45,7 @@ function applyRename(asset: AssetItem, rename: RenameSettings, settings: Optimiz
     .replaceAll("{date}", new Date().toISOString().slice(0, 10))
     .replaceAll("{width}", asset.width ? String(asset.width) : "")
     .replaceAll("{height}", asset.height ? String(asset.height) : "")
-    .replaceAll("{format}", chooseOutputFormat(asset, settings));
+    .replaceAll("{format}", outputExtension(chooseOutputFormat(asset, settings)));
 
   if (rename.find) {
     name = name.replaceAll(rename.find, rename.replace);
@@ -82,7 +76,7 @@ function applyRename(asset: AssetItem, rename: RenameSettings, settings: Optimiz
 
 function normalizeExtension(extension: string): string {
   const normalized = extension.replace(/^\./, "").toLowerCase();
-  return normalized === "jpg" ? "jpeg" : normalized;
+  return extensionAliases[normalized] ?? normalized;
 }
 
 function sanitizeFileName(name: string): string {

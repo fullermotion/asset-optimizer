@@ -18,7 +18,7 @@ export function DropZone({ dragging, onChooseFiles }: DropZoneProps) {
         </span>
       </div>
       <h2>Drop assets</h2>
-      <p>Images and videos are added to the queue with thumbnails, file details, and rename previews.</p>
+      <p>Images, videos, and audio are added to the queue with thumbnails, file details, and rename previews.</p>
       <button className="button primary" type="button" onClick={onChooseFiles}>
         <FontAwesomeIcon icon={faArrowUpFromBracket} />
         <span>Select files</span>

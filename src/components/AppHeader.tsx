@@ -35,7 +35,7 @@ export function AppHeader({
         </span>
         <div>
           <h1>Asset Optimizer</h1>
-          <p>{assetCount === 0 ? "Ready for images and videos" : `${assetCount} asset${assetCount === 1 ? "" : "s"} queued`}</p>
+          <p>{assetCount === 0 ? "Ready for images, videos, and audio" : `${assetCount} asset${assetCount === 1 ? "" : "s"} queued`}</p>
         </div>
       </div>
 

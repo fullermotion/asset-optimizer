@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBolt, faCircleNotch, faFolderOpen, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { AppHeader } from "./components/AppHeader";
@@ -6,7 +6,7 @@ import { AssetQueue } from "./components/AssetQueue";
 import { DropZone } from "./components/DropZone";
 import { SettingsPanel } from "./components/SettingsPanel";
 import { defaultSettings } from "./data/presets";
-import type { ActivePanel, AssetItem, OptimizerSettings, ThemeMode } from "./types";
+import type { ActivePanel, AssetItem, Capabilities, OptimizerSettings, ThemeMode } from "./types";
 import { formatBytes } from "./utils/format";
 
 function App() {
@@ -18,6 +18,7 @@ function App() {
   const [theme, setTheme] = useState<ThemeMode>(() => loadTheme());
   const [dragging, setDragging] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const [capabilities, setCapabilities] = useState<Capabilities>({ av1Encoder: null, av1Accelerated: false });
 
   const readyAssets = assets.filter((asset) => asset.status !== "running" && asset.type !== "unsupported");
   const totalInputSize = useMemo(() => assets.reduce((sum, asset) => sum + asset.size, 0), [assets]);
@@ -32,6 +33,10 @@ function App() {
   useEffect(() => {
     window.localStorage.setItem("asset-optimizer-settings", JSON.stringify(settings));
   }, [settings]);
+
+  useEffect(() => {
+    api.getCapabilities().then(setCapabilities, () => undefined);
+  }, [api]);
 
   useEffect(() => {
     return api.onProgress((update) => {
@@ -64,8 +69,22 @@ function App() {
     }
 
     const metadata = await api.readAssetMetadata(newPaths);
-    setAssets((current) => [...current, ...metadata]);
+    setAssets((current) => {
+      // Another drop can finish while this one is still reading metadata.
+      const known = new Set(current.map((asset) => asset.path));
+      return [...current, ...metadata.filter((asset) => !known.has(asset.path))];
+    });
   };
+
+  const removeAsset = useCallback((id: string) => {
+    setAssets((current) => current.filter((asset) => asset.id !== id));
+  }, []);
+
+  const clearDone = useCallback(() => {
+    setAssets((current) => current.filter((asset) => asset.status !== "done"));
+  }, []);
+
+  const revealAsset = useCallback((filePath: string) => api.revealInFinder(filePath), [api]);
 
   const chooseFiles = async () => {
     const selected = await api.selectFiles();
@@ -104,10 +123,11 @@ function App() {
 
     const jobs = readyAssets.map((asset, index) => ({ ...asset, batchIndex: index + 1 }));
     const results = await api.optimizeAssets({ assets: jobs, settings });
+    const resultsById = new Map(results.map((result) => [result.id, result]));
 
     setAssets((current) =>
       current.map((asset) => {
-        const result = results.find((candidate) => candidate.id === asset.id);
+        const result = resultsById.get(asset.id);
         if (!result) {
           return asset;
         }
@@ -169,14 +189,20 @@ function App() {
             <AssetQueue
               assets={assets}
               settings={settings}
-              onRemove={(id) => setAssets((current) => current.filter((asset) => asset.id !== id))}
-              onClearDone={() => setAssets((current) => current.filter((asset) => asset.status !== "done"))}
-              onReveal={(filePath) => api.revealInFinder(filePath)}
+              onRemove={removeAsset}
+              onClearDone={clearDone}
+              onReveal={revealAsset}
             />
           )}
         </div>
 
-        <SettingsPanel activePanel={activePanel} settings={settings} onPanelChange={setActivePanel} onSettingsChange={setSettings} />
+        <SettingsPanel
+          activePanel={activePanel}
+          settings={settings}
+          capabilities={capabilities}
+          onPanelChange={setActivePanel}
+          onSettingsChange={setSettings}
+        />
       </main>
 
       <footer className="action-bar">
@@ -236,6 +262,7 @@ function getAssetOptimizerApi() {
 
 const browserPreviewApi: Window["assetOptimizer"] = {
   platform: "browser",
+  getCapabilities: async () => ({ av1Encoder: null, av1Accelerated: false }),
   selectFiles: async () => [],
   selectOutputFolder: async () => null,
   readAssetMetadata: async () => [],

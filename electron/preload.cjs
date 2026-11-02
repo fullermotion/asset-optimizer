@@ -2,6 +2,7 @@ const { contextBridge, ipcRenderer, webUtils } = require("electron");
 
 contextBridge.exposeInMainWorld("assetOptimizer", {
   platform: process.platform,
+  getCapabilities: () => ipcRenderer.invoke("app:capabilities"),
   selectFiles: () => ipcRenderer.invoke("files:select"),
   selectOutputFolder: () => ipcRenderer.invoke("folder:selectOutput"),
   readAssetMetadata: (filePaths) => ipcRenderer.invoke("assets:metadata", filePaths),

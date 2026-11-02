@@ -6,6 +6,9 @@ dist/
 release/
 out/
 
+# Downloaded binaries (scripts/fetch-ffmpeg.mjs)
+vendor/
+
 # Electron/Vite local state
 .vite/
 *.tsbuildinfo
