@@ -6,17 +6,20 @@ import {
   faSliders,
   faVolumeXmark
 } from "@fortawesome/free-solid-svg-icons";
-import type { ActivePanel, OptimizerSettings } from "../types";
+import type { ActivePanel, Capabilities, EffortLevel, OptimizerSettings } from "../types";
 import { settingsForPreset } from "../data/presets";
 
 interface SettingsPanelProps {
   activePanel: ActivePanel;
   settings: OptimizerSettings;
+  capabilities: Capabilities;
   onPanelChange: (panel: ActivePanel) => void;
   onSettingsChange: (settings: OptimizerSettings) => void;
 }
 
-export function SettingsPanel({ activePanel, settings, onPanelChange, onSettingsChange }: SettingsPanelProps) {
+export function SettingsPanel({ activePanel, settings, capabilities, onPanelChange, onSettingsChange }: SettingsPanelProps) {
+  const av1Label = !capabilities.av1Encoder ? "AV1, unavailable" : capabilities.av1Accelerated ? "AV1" : "AV1, slow";
+
   const update = <K extends keyof OptimizerSettings>(key: K, value: OptimizerSettings[K]) => {
     onSettingsChange({ ...settings, [key]: value, preset: key === "preset" ? value as OptimizerSettings["preset"] : "custom" });
   };
@@ -73,6 +76,15 @@ export function SettingsPanel({ activePanel, settings, onPanelChange, onSettings
             <h2>Quality</h2>
             <RangeField label="Image quality" value={settings.quality} onChange={(value) => update("quality", value)} />
             <RangeField label="Video quality" value={settings.videoQuality} onChange={(value) => update("videoQuality", value)} />
+            <RangeField label="Audio quality" value={settings.audioQuality} onChange={(value) => update("audioQuality", value)} />
+            <label className="field">
+              <span>Compression effort</span>
+              <select value={settings.effort} onChange={(event) => update("effort", event.target.value as EffortLevel)}>
+                <option value="fast">Fast</option>
+                <option value="balanced">Balanced</option>
+                <option value="max">Maximum (slowest, smallest)</option>
+              </select>
+            </label>
             <label className="toggle">
               <input
                 type="checkbox"
@@ -80,6 +92,10 @@ export function SettingsPanel({ activePanel, settings, onPanelChange, onSettings
                 onChange={(event) => update("preserveMetadata", event.target.checked)}
               />
               <span>Preserve metadata</span>
+            </label>
+            <label className="toggle">
+              <input type="checkbox" checked={settings.wideGamut} onChange={(event) => update("wideGamut", event.target.checked)} />
+              <span>Keep wide-gamut colour (Display P3)</span>
             </label>
           </section>
         ) : null}
@@ -115,11 +131,23 @@ export function SettingsPanel({ activePanel, settings, onPanelChange, onSettings
                 <option value="jpeg">Image: JPEG</option>
                 <option value="png">Image: PNG</option>
                 <option value="avif">Image: AVIF</option>
-                <option value="mp4">Video: MP4</option>
-                <option value="webm">Video: WebM</option>
+                <option value="jxl">Image: JPEG XL</option>
+                <option value="mp4">Video: MP4 (H.264)</option>
+                <option value="mp4-hevc">Video: MP4 (H.265/HEVC)</option>
+                <option value="mp4-av1" disabled={!capabilities.av1Encoder}>Video: MP4 ({av1Label})</option>
+                <option value="webm">Video: WebM (VP9)</option>
+                <option value="webm-av1" disabled={!capabilities.av1Encoder}>Video: WebM ({av1Label})</option>
                 <option value="mov">Video: MOV</option>
                 <option value="mkv">Video: MKV</option>
+                <option value="m4a">Audio: M4A (AAC)</option>
+                <option value="opus">Audio: Opus</option>
+                <option value="mp3">Audio: MP3</option>
+                <option value="flac">Audio: FLAC (lossless)</option>
               </select>
+            </label>
+            <label className="toggle">
+              <input type="checkbox" checked={settings.avif10Bit} onChange={(event) => update("avif10Bit", event.target.checked)} />
+              <span>10-bit AVIF (smoother gradients)</span>
             </label>
             <label className="toggle">
               <input type="checkbox" checked={settings.stripAudio} onChange={(event) => update("stripAudio", event.target.checked)} />

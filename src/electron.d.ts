@@ -1,9 +1,10 @@
-import type { AssetItem, OptimizePayload, ProgressUpdate } from "./types";
+import type { AssetItem, Capabilities, OptimizePayload, ProgressUpdate } from "./types";
 
 declare global {
   interface Window {
     assetOptimizer: {
       platform: string;
+      getCapabilities: () => Promise<Capabilities>;
       selectFiles: () => Promise<string[]>;
       selectOutputFolder: () => Promise<string | null>;
       readAssetMetadata: (filePaths: string[]) => Promise<AssetItem[]>;

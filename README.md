@@ -1,14 +1,15 @@
 # Asset Optimizer
 
-Asset Optimizer is a desktop app for optimizing, converting, and batch-renaming image and video assets. It is built with Electron, React, Vite, Sharp, FFmpeg, Font Awesome icons, and the Inter typeface.
+Asset Optimizer is a desktop app for optimizing, converting, and batch-renaming image, video, and audio assets. It is built with Electron, React, Vite, Sharp, FFmpeg, oxipng, libjxl, Font Awesome icons, and the Inter typeface.
 
 Copyright (c) 2026 Fullermotion LLC.  
 Website: https://www.fullermotion.com
 
 ## Features
 
-- Optimize images and videos with adjustable quality settings.
-- Convert images and videos to common output formats.
+- Optimize images, videos, and audio with adjustable quality and compression effort settings.
+- Convert to modern formats: WebP, AVIF, JPEG XL, H.265/HEVC, AV1, VP9, Opus, and FLAC alongside JPEG, PNG, H.264, AAC, and MP3.
+- Keep the wide-gamut colour of iPhone (Display P3) and Adobe RGB photos instead of clipping them to sRGB.
 - Review original asset dimensions before processing.
 - Resize manually by maximum width and height, or scale assets by percentage from 1% to 100%.
 - Batch rename files with pattern tokens, prefix/suffix fields, find-and-replace, padding, case options, and slugified filenames.
@@ -23,7 +24,23 @@ Image input support includes JPG, JPEG, PNG, WebP, AVIF, TIFF, HEIC, and HEIF.
 
 Video input support includes MP4, MOV, M4V, WebM, MKV, and AVI.
 
+Audio input support includes MP3, WAV, AIFF, FLAC, M4A, AAC, OGG, and Opus.
+
 Output support depends on the selected source type and target format. HEIC and HEIF input on macOS uses the system image tooling as a fallback before optimization.
+
+## Encoders
+
+- JPEG uses mozjpeg, with full 4:4:4 chroma at quality 90 and above.
+- PNG below quality 90 is palette-quantised with libimagequant; at 90 and above it stays lossless with adaptive row filtering. Both then go through oxipng (via `@napi-rs/image`) at Balanced and Maximum effort.
+- WebP uses sharp YUV chroma subsampling. AVIF uses libaom's perceptual `iq` tuning and 10-bit encoding by default. Quality 100 switches both to lossless.
+- JPEG XL uses libjxl's WebAssembly build (`@jsquash/jxl`) in a worker thread. It encodes 8-bit sRGB, so wide-gamut sources are converted to sRGB for this format only.
+- Photos with a wide-gamut ICC profile keep that profile in every other output format when "Keep wide-gamut colour" is on.
+- Video quality maps to a CRF calibrated per codec so the same slider position gives similar visual quality in H.264, HEVC, VP9, and AV1.
+- FFmpeg comes from `ffmpeg-static`, pinned to an exact version because its minor releases can change the downloaded binary.
+- On Apple Silicon, `npm install` also runs `scripts/fetch-ffmpeg.mjs`, which downloads FFmpeg and FFprobe 9.0.2 from [Martin Riedl's build server](https://ffmpeg.martin-riedl.de) into `vendor/`, verifies their SHA-256 checksums, and bundles them with the macOS build. Their SVT-AV1 uses ARM SIMD, unlike the `ffmpeg-static` arm64 binary. If the download fails, the app falls back to `ffmpeg-static`.
+- AV1 uses SVT-AV1 when ffmpeg includes it and falls back to libaom. The app marks AV1 as slow when SVT-AV1 lacks SIMD support.
+- AAC uses Apple's AudioToolbox encoder on macOS, then libfdk_aac when available, then ffmpeg's built-in encoder.
+- Compression effort (Fast, Balanced, Maximum) trades encode time for smaller files across every encoder.
 
 ## Requirements
 
